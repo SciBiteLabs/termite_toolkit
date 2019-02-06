@@ -3,3 +3,4 @@
 
 # list of python libraries to install with version numbers
 requests >= 2.8.1
+pandas >= 0.23.4

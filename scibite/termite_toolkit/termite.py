@@ -18,6 +18,7 @@ __license__ = 'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Interna
 
 import requests
 import os
+import pandas as pd
 
 
 class TermiteRequestBuilder():
@@ -346,7 +347,8 @@ def process_payload(filtered_hits, response_payload, filter_entity_types, doc_id
     return filtered_hits
 
 
-def get_entity_hits_from_json(termite_json_response, filter_entity_types, reject_ambig=True, score_cutoff=0):
+def get_entity_hits_from_json(termite_json_response, filter_entity_types, reject_ambig=True, score_cutoff=0,
+                              asDataFrame=False):
     """
 
 
@@ -354,6 +356,7 @@ def get_entity_hits_from_json(termite_json_response, filter_entity_types, reject
     :param filter_entity_types: string of entity types separated by commas
     :param reject_ambig: boolean
     :param score_cutoff: a numeric value between 1-5
+    :param asDataFrame: boolean
     :return:
     """
     filtered_hits = {}
@@ -369,4 +372,8 @@ def get_entity_hits_from_json(termite_json_response, filter_entity_types, reject
         filtered_hits = process_payload(filtered_hits, response_payload, filter_entity_types, reject_ambig=reject_ambig,
                                         score_cutoff=score_cutoff)
 
-    return filtered_hits
+    if asDataFrame == True:
+        filtered_hits_df = pd.DataFrame(filtered_hits).T
+        return filtered_hits_df
+    else:
+        return filtered_hits

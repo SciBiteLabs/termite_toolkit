@@ -18,6 +18,7 @@ __license__ = 'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Interna
 
 import requests
 import os
+import pandas as pd
 
 
 class TexpressRequestBuilder():
@@ -420,13 +421,14 @@ def process_payload(texpress_hits, response_payload, doc_id='', score_cutoff=0,
     return texpress_hits
 
 
-def get_entity_hits_from_json(termite_json_response, score_cutoff=0):
+def get_entity_hits_from_json(termite_json_response, score_cutoff=0, asDataFrame=False):
     """
     Remove the entity hits from returned TExpress JSON and return a dictionary in the format
-    (pattern_id : (orig_sentence, [entities]))
+    (pattern_id : (orig_sentence, [entities])) or pandas dataframe
     
     :param termite_json_response: JSON returned from TExpress
     :param score_cutoff: a numeric value between 1-5
+    :param asDataFrame: boolean
     :return: 
     """
 
@@ -437,4 +439,13 @@ def get_entity_hits_from_json(termite_json_response, score_cutoff=0):
         for doc_id, response_payload in doc_results.items():
             filtered_hits = process_payload(filtered_hits, response_payload, score_cutoff=score_cutoff, doc_id=doc_id)
 
-    return filtered_hits
+    if asDataFrame == True:
+        hits = []
+        for patternID, patternHits in filtered_hits.items():
+            for hit in patternHits:
+                hit['patternID'] = patternID
+                hits.append(hit)
+        filtered_hits_df = pd.DataFrame(hits)
+        return filtered_hits_df
+    else:
+        return filtered_hits
