@@ -84,7 +84,12 @@ class TexpressRequestBuilder():
         :param options_dict: a dictionary of options to be passed to TERMite
         :return: 
         """
+        to_payload = ['output', 'bundle', 'pattern', 'method']
         options = []
+
+        if key in to_payload:
+            self.payload[key] = value
+
         for k, v in options_dict.items():
             options.append(k + "=" + str(v))
         option_string = '&'.join(options)

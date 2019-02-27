@@ -84,6 +84,10 @@ class TermiteRequestBuilder():
         :param options_dict: a dictionary of options to be passed to TERMite
         :return:
         """
+
+        if 'output' in options_dict:
+            self.payload['output'] = options_dict['output']
+
         options = []
         for k, v in options_dict.items():
             options.append(k + "=" + str(v))
