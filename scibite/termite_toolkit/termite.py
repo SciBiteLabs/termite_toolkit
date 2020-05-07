@@ -325,6 +325,7 @@ def get_entity_hits_from_json(termite_json_response, filter_entity_types, reject
     return filtered_hits
 
 
+
 def docjsonx_payload_records(docjsonx_response_payload, reject_ambig=True, score_cutoff=0, remove_subsumed=True):
     """
     Parses TERMite doc.JSONx payload into records, includes rules to filter out ambiguous and low-relevance hits
@@ -479,6 +480,30 @@ def get_entity_hits_from_docjsonx(termite_response, filter_entity_types):
 
     return (filtered_hits)
 
+def termite_entity_hits_df(termite_response, filter_entity_types):
+    """
+    Parses TERmite response and returns a summary of the hits where each column 
+    corresponds to an entity or its ID. The table entries are strings
+    containing the list of entities separated by the | delimiter.
+    
+    :param termite_response: doc.JSONx TERMite response
+    :param filter_entity_types: comma separated list
+    :return: pandas dataframe
+    """
+    #Magic formula that adds vocab ID header right after each vocab
+    entitieswid = [*sum(zip(filter_entity_types,[entity_type+'_ID' for entity_type in filter_entity_types]),())]
+    #Initialise dictionary of lists to be added to the dataframe later on
+    dic = {header: [] for header in entitieswid}
+    #Populate dictionary with relevant entity hits
+    entity_hits = get_entity_hits_from_docjsonx(termite_response,filter_entity_types)
+    for entity in entity_hits.values():
+        dic[entity['type']]+=[entity['name']]
+        dic[entity['type']+'_ID']+=[entity['id']]
+    df = pd.DataFrame([],columns=entitieswid)
+    #Populate dataframe based on the dictionary
+    for d in dic:
+        df[d]=[' | '.join(dic[d])]
+    return df
 
 def all_entities(termite_response):
     """
